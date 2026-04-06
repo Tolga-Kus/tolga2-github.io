@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeatMaster Pro — Beatbox Tutorials & Coaching</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --dark: #111111;
+    --card: #161616;
+    --border: rgba(255,255,255,0.08);
+    --border-glow: rgba(255, 200, 0, 0.3);
+    --gold: #FFD000;
+    --gold-dark: #c4a000;
+    --gold-light: #ffe55a;
+    --white: #f5f0e8;
+    --gray: #888;
+    --light-gray: #bbb;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  /* ─── CURSOR ─── */
+  .cursor-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(255,208,0,0.5);
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.15s, width 0.2s, height 0.2s;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.2rem 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--gold);
+  }
+  .nav-logo span { color: var(--white); }
+  .nav-links {
+    display: flex; gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: var(--gold);
+    color: var(--black) !important;
+    padding: 0.6rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 700 !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--gold-light) !important; transform: scale(1.04); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(255,208,0,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 70%, rgba(255,208,0,0.04) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,208,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,208,0,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { from { transform: translateY(0); } to { transform: translateY(60px); } }
+
+  .hero-content { position: relative; max-width: 750px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,208,0,0.1);
+    border: 1px solid rgba(255,208,0,0.3);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.7s 0.1s ease both;
+  }
+  .hero h1 .gold { color: var(--gold); }
+  .hero h1 .outline {
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    color: transparent;
+  }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--light-gray);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.7s 0.2s ease both;
+  }
+  .hero-ctas {
+    display: flex; gap: 1rem; align-items: center;
+    animation: fadeInUp 0.7s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    border-radius: 4px;
+    transition: all 0.25s;
+    border: none; cursor: pointer;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,208,0,0.3);
+  }
+  .btn-ghost {
+    color: var(--white);
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    transition: gap 0.2s;
+    cursor: pointer;
+    background: none; border: none;
+  }
+  .btn-ghost:hover { gap: 14px; color: var(--gold); }
+  .btn-ghost::after { content: '→'; }
+
+  .hero-stats {
+    display: flex; gap: 3rem;
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    animation: fadeInUp 0.7s 0.4s ease both;
+  }
+  .stat-val {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .hero-visual {
+    position: absolute;
+    right: 4rem; top: 50%; transform: translateY(-50%);
+    width: 380px; height: 380px;
+  }
+  .waveform-container {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .waveform-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,208,0,0.15);
+    animation: ringPulse 3s ease infinite;
+  }
+  .waveform-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+  .waveform-ring:nth-child(2) { width: 75%; height: 75%; animation-delay: 0.5s; }
+  .waveform-ring:nth-child(3) { width: 50%; height: 50%; animation-delay: 1s; }
+  @keyframes ringPulse {
+    0%,100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+  }
+  .waveform-bars {
+    display: flex; align-items: center; gap: 4px;
+    position: relative; z-index: 2;
+  }
+  .waveform-bars span {
+    display: block;
+    width: 6px;
+    background: var(--gold);
+    border-radius: 3px;
+    animation: barPulse 0.8s ease infinite;
+  }
+  @keyframes barPulse {
+    0%,100% { height: 20px; opacity: 0.4; }
+    50% { height: var(--h); opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION BASICS ─── */
+  section { padding: 8rem 4rem; }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before {
+    content: '';
+    display: block; width: 30px; height: 1px;
+    background: var(--gold);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+  .section-sub {
+    color: var(--gray);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ─── FUNNEL SECTION ─── */
+  .funnel { background: var(--dark); }
+  .funnel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  .funnel-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: pointer;
+  }
+  .funnel-card:hover {
+    border-color: rgba(255,208,0,0.4);
+    transform: translateY(-6px);
+  }
+  .funnel-card.featured {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #1a1800 0%, var(--card) 100%);
+  }
+  .funnel-card.featured::before {
+    content: 'BELIEBTESTE WAHL';
+    position: absolute; top: 20px; right: 20px;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+  .funnel-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .funnel-icon.free { background: rgba(255,255,255,0.05); }
+  .funnel-icon.online { background: rgba(255,208,0,0.1); }
+  .funnel-icon.live { background: rgba(255,100,100,0.1); }
+  .funnel-tag {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+  }
+  .funnel-name {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+    color: var(--white);
+  }
+  .funnel-card.featured .funnel-name { color: var(--gold); }
+  .funnel-desc {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .funnel-price {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .funnel-price-val {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--white);
+  }
+  .funnel-card.featured .funnel-price-val { color: var(--gold); }
+  .funnel-price-period { color: var(--gray); font-size: 0.9rem; }
+  .funnel-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+  .funnel-list li {
+    font-size: 0.88rem;
+    color: var(--light-gray);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .funnel-list li::before {
+    content: '✓';
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+  .funnel-btn {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .funnel-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .funnel-card.featured .funnel-btn {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+  .funnel-card.featured .funnel-btn:hover {
+    background: var(--gold-light);
+  }
+
+  /* ─── MODULES ─── */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  .module-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card:hover {
+    border-color: rgba(255,208,0,0.3);
+    transform: translateY(-4px);
+  }
+  .module-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .module-card:hover::after { opacity: 1; }
+  .module-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 1rem;
+  }
+  .module-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+  }
+  .module-desc {
+    color: var(--gray);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .module-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .tag.gold {
+    background: rgba(255,208,0,0.08);
+    border-color: rgba(255,208,0,0.2);
+    color: var(--gold);
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  .testimonials { background: var(--dark); overflow: hidden; }
+  .testimonials-track-wrapper {
+    overflow: hidden;
+    margin-top: 4rem;
+  }
+  .testimonials-track {
+    display: flex; gap: 1.5rem;
+    width: max-content;
+    animation: scrollTrack 40s linear infinite;
+  }
+  .testimonials-track:hover { animation-play-state: paused; }
+  @keyframes scrollTrack {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .tcard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    width: 360px;
+    flex-shrink: 0;
+  }
+  .tcard-stars {
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+  }
+  .tcard-text {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--light-gray);
+    margin-bottom: 1.5rem;
+  }
+  .tcard-author {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .tcard-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    background: rgba(255,208,0,0.15);
+    color: var(--gold);
+  }
+  .tcard-name { font-weight: 600; font-size: 0.9rem; }
+  .tcard-meta { font-size: 0.78rem; color: var(--gray); }
+
+  /* ─── INFOMATERIAL ─── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .info-card:hover { border-color: rgba(255,208,0,0.3); }
+  .info-card-bg {
+    position: absolute; bottom: -30px; right: -30px;
+    font-size: 8rem;
+    opacity: 0.04;
+    pointer-events: none;
+    font-family: var(--font-display);
+  }
+  .info-card-label {
+    font-size: 0.72rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .info-card-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+  }
+  .info-card-text {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+  .info-download {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(255,208,0,0.3);
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: none;
+  }
+  .info-download:hover {
+    background: rgba(255,208,0,0.08);
+    border-color: var(--gold);
+  }
+
+  /* ─── VIDEO TEASER ─── */
+  .video-section { background: var(--black); padding: 6rem 4rem; }
+  .video-wrapper {
+    margin-top: 4rem;
+    aspect-ratio: 16/9;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    background: var(--dark);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .video-placeholder {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,208,0,0.05) 0%, transparent 70%);
+  }
+  .play-btn {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+  }
+  .play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(255,208,0,0.4);
+  }
+  .play-btn svg { width: 28px; height: 28px; fill: var(--black); margin-left: 4px; }
+  .video-caption {
+    position: absolute; bottom: 1.5rem; left: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  /* ─── CTA FINAL ─── */
+  .cta-final {
+    background: var(--dark);
+    text-align: center;
+    padding: 10rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,208,0,0.06) 0%, transparent 70%);
+  }
+  .cta-final h2 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    letter-spacing: 2px;
+    line-height: 0.95;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .cta-final h2 span { color: var(--gold); }
+  .cta-final p {
+    color: var(--gray);
+    font-size: 1.1rem;
+    max-width: 480px;
+    margin: 0 auto 3rem;
+    line-height: 1.7;
+    position: relative;
+  }
+  .cta-form {
+    display: flex; gap: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .cta-input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.5rem;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cta-input:focus { border-color: var(--gold); }
+  .cta-input::placeholder { color: var(--gray); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--border);
+    padding: 4rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+  .footer-brand .nav-logo { margin-bottom: 1rem; display: block; }
+  .footer-tagline { color: var(--gray); font-size: 0.88rem; max-width: 280px; line-height: 1.7; }
+  .footer-col-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--light-gray);
+    margin-bottom: 1.2rem;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-col ul a { color: var(--gray); font-size: 0.88rem; transition: color 0.2s; }
+  .footer-col ul a:hover { color: var(--gold); }
+  .footer-bottom {
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--gray);
+    font-size: 0.82rem;
+  }
+
+  /* ─── SOUNDWAVE VISUALIZER ─── */
+  .soundwave {
+    display: flex; align-items: center; gap: 3px;
+    padding: 0 1rem;
+  }
+  .soundwave-bar {
+    width: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    opacity: 0.7;
+    animation: swPulse 1.2s ease infinite;
+  }
+  @keyframes swPulse {
+    0%,100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+  }
+
+  /* ─── SCROLL INDICATOR ─── */
+  .scroll-indicator {
+    position: absolute; bottom: 3rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--gray); font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+    animation: fadeInUp 1s 1s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--gray), transparent);
+    animation: scrollLine 1.5s ease infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0) translateY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section, .hero, footer { padding: 5rem 1.5rem; }
+    .hero { padding-top: 7rem; }
+    .hero-visual { display: none; }
+    .funnel-grid, .modules-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr 1fr; }
+    .cta-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">BEAT<span>MASTER</span></div>
+  <ul class="nav-links">
+    <li><a href="#angebote">Angebote</a></li>
+    <li><a href="#module">Module</a></li>
+    <li><a href="#testimonials">Bewertungen</a></li>
+    <li><a href="#infomaterial">Material</a></li>
+    <li><a href="#kontakt" class="nav-cta">Jetzt starten</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Beatbox-Coaching · Online &amp; Live
+    </div>
+    <h1>
+      LERNE<br>
+      <span class="gold">BEAT</span><br>
+      <span class="outline">BOXEN</span>
+    </h1>
+    <p class="hero-sub">
+      Von Null zum Profi — mit dem deutschen Beatbox-System. Über 2.400 Lernende haben ihren Sound bereits gefunden.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="document.getElementById('angebote').scrollIntoView({behavior:'smooth'})">Kostenlos starten</button>
+      <button class="btn-ghost" onclick="document.getElementById('module').scrollIntoView({behavior:'smooth'})">Kurse entdecken</button>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-val">2.4K+</div>
+        <div class="stat-label">Schüler</div>
+      </div>
+      <div>
+        <div class="stat-val">38</div>
+        <div class="stat-label">Module</div>
+      </div>
+      <div>
+        <div class="stat-val">9.7</div>
+        <div class="stat-label">Bewertung</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="waveform-container">
+      <div class="waveform-ring"></div>
+      <div class="waveform-ring"></div>
+      <div class="waveform-ring"></div>
+      <div class="waveform-bars" id="heroWave"></div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    Scroll
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- VIDEO TEASER -->
+<div class="video-section">
+  <div class="section-label">Einblick</div>
+  <h2 class="section-title">Sieh es in AKTION</h2>
+  <div class="video-wrapper">
+    <div class="video-placeholder"></div>
+    <div class="play-btn">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <div class="video-caption">Freie Lektion — Grundlagen Kick & Hi-Hat · 12 Min</div>
+  </div>
+</div>
+
+<!-- FUNNEL ANGEBOTE -->
+<section class="funnel" id="angebote">
+  <div class="section-label">Preise & Pakete</div>
+  <h2 class="section-title">DEIN EINSTIEG</h2>
+  <p class="section-sub">Starte kostenlos, wachse mit Online-Modulen, oder hol dir persönliches 1:1 Coaching — du entscheidest dein Tempo.</p>
+
+  <div class="funnel-grid">
+    <!-- FREE -->
+    <div class="funnel-card">
+      <div class="funnel-icon free">🎙️</div>
+      <div class="funnel-tag">Einstieg</div>
+      <div class="funnel-name">FREE</div>
+      <div class="funnel-desc">Starte kostenlos und lerne die absoluten Basics. Perfekt um zu testen, ob Beatboxen dein Ding ist.</div>
+      <div class="funnel-price">
+        <span class="funnel-price-val">0€</span>
+        <span class="funnel-price-period">für immer</span>
+      </div>
+      <ul class="funnel-list">
+        <li>5 Einstiegsvideos</li>
+        <li>Basis-Kick & Hi-Hat</li>
+        <li>Community-Zugang</li>
+        <li>PDF-Grundlagenblatt</li>
+        <li>Wöchentlicher Newsletter</li>
+      </ul>
+      <button class="funnel-btn" onclick="alert('Kostenlos registrieren — kommt bald!')">Kostenlos starten</button>
+    </div>
+
+    <!-- ONLINE PRO -->
+    <div class="funnel-card featured">
+      <div class="funnel-icon online">🔥</div>
+      <div class="funnel-tag">Digital</div>
+      <div class="funnel-name">ONLINE PRO</div>
+      <div class="funnel-desc">Der vollständige Online-Kurs mit 38 Modulen, Live-Sessions und persönlichem Feedback via Video.</div>
+      <div class="funnel-price">
+        <span class="funnel-price-val">149€</span>
+        <span class="funnel-price-period">/ einmalig</span>
+      </div>
+      <ul class="funnel-list">
+        <li>38 Video-Module</li>
+        <li>Anfänger → Fortgeschrittene</li>
+        <li>2× monatliche Live-Sessions</li>
+        <li>Feedback-Plattform</li>
+        <li>Alle PDFs & Übungsblätter</li>
+        <li>Private Community</li>
+        <li>Lebenslanger Zugang</li>
+      </ul>
+      <button class="funnel-btn" onclick="alert('Weiterleitung zum Checkout…')">Jetzt buchen</button>
+    </div>
+
+    <!-- LIVE COACHING -->
+    <div class="funnel-card">
+      <div class="funnel-icon live">⚡</div>
+      <div class="funnel-tag">Premium</div>
+      <div class="funnel-name">LIVE 1:1</div>
+      <div class="funnel-desc">Maximaler Fortschritt durch persönlichen Präsenzunterricht oder Video-Coaching, maßgeschneidert für dich.</div>
+      <div class="funnel-price">
+        <span class="funnel-price-val">89€</span>
+        <span class="funnel-price-period">/ Stunde</span>
+      </div>
+      <ul class="funnel-list">
+        <li>Persönliches 1:1 Coaching</li>
+        <li>Online oder Präsenz (Hamburg)</li>
+        <li>Individueller Lehrplan</li>
+        <li>Aufnahmen aller Sessions</li>
+        <li>WhatsApp-Support</li>
+        <li>Karriere-Beratung</li>
+        <li>5er-Block: 399€ (spare 46€)</li>
+      </ul>
+      <button class="funnel-btn" onclick="alert('Terminanfrage senden…')">Termin anfragen</button>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE -->
+<section id="module" style="background: var(--black);">
+  <div class="section-label">Lernpfad</div>
+  <h2 class="section-title">38 MODULE,<br>EIN SYSTEM</h2>
+  <p class="section-sub">Strukturiert, praxisnah, progressiv aufgebaut. Jedes Modul baut auf dem vorherigen auf.</p>
+
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="module-num">// MODUL 01 — 06</div>
+      <div class="module-title">GRUNDLAGEN</div>
+      <div class="module-desc">Die Basis jedes Beatboxers: Atmung, Körperhaltung, die drei Core-Sounds. Ohne solide Grundlagen kein Style.</div>
+      <div class="module-tags">
+        <span class="tag">Anfänger</span>
+        <span class="tag">Kick</span>
+        <span class="tag">Hi-Hat</span>
+        <span class="tag">Snare</span>
+        <span class="tag gold">Kostenlos</span>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-num">// MODUL 07 — 13</div>
+      <div class="module-title">RHYTHMIK</div>
+      <div class="module-desc">Timing, Groove und Polyrhythmik. Du lernst, Beats in verschiedenen Tempos und Stilen zu spielen.</div>
+      <div class="module-tags">
+        <span class="tag">Einsteiger</span>
+        <span class="tag">Timing</span>
+        <span class="tag">Polyrhythmus</span>
+        <span class="tag">Metronom</span>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-num">// MODUL 14 — 20</div>
+      <div class="module-title">SOUNDS</div>
+      <div class="module-desc">Über 40 Sounds — von klassischem Trap bis Drum &amp; Bass, Techno, und Jungle. Erweitere dein Repertoire massiv.</div>
+      <div class="module-tags">
+        <span class="tag">Fortgeschrittene</span>
+        <span class="tag">Trap</span>
+        <span class="tag">Drum &amp; Bass</span>
+        <span class="tag">40+ Sounds</span>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-num">// MODUL 21 — 26</div>
+      <div class="module-title">BEATMAKING</div>
+      <div class="module-desc">Beats von Grund auf komponieren. Strukturen, Fills, Drops — so baust du einen kompletten Track mit deinem Mund.</div>
+      <div class="module-tags">
+        <span class="tag">Fortgeschrittene</span>
+        <span class="tag">Komposition</span>
+        <span class="tag">Drops</span>
+        <span class="tag">Fills</span>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-num">// MODUL 27 — 32</div>
+      <div class="module-title">PERFORMANCE</div>
+      <div class="module-desc">Bühnenpräsenz, Publikumsinteraktion, Looping-Setup, Mic-Technik. Alles was du für Auftritte brauchst.</div>
+      <div class="module-tags">
+        <span class="tag">Profi</span>
+        <span class="tag">Bühne</span>
+        <span class="tag">Looper</span>
+        <span class="tag">Mic</span>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-num">// MODUL 33 — 38</div>
+      <div class="module-title">WETTBEWERB</div>
+      <div class="module-desc">Battle-Vorbereitung, Judging-Kriterien, Mentalcoaching. Bereit für die nächste German Beatbox Championship.</div>
+      <div class="module-tags">
+        <span class="tag">Elite</span>
+        <span class="tag">Battle</span>
+        <span class="tag">Mental</span>
+        <span class="tag gold">1:1 empfohlen</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="section-label">Stimmen</div>
+  <h2 class="section-title">WAS SCHÜLER SAGEN</h2>
+
+  <div class="testimonials-track-wrapper">
+    <div class="testimonials-track" id="ttrack">
+      <!-- Cards populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- INFOMATERIAL -->
+<section id="infomaterial" style="background: var(--black);">
+  <div class="section-label">Downloads</div>
+  <h2 class="section-title">KOSTENLOSES<br>INFOMATERIAL</h2>
+  <p class="section-sub">Lade dir Lernmaterial, Übungsblätter und Guides direkt herunter — für deinen Einstieg und Fortschritt.</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-bg">PDF</div>
+      <div class="info-card-label">Starter Guide</div>
+      <div class="info-card-title">BEATBOX-GRUNDLAGEN<br>KOMPAKT</div>
+      <div class="info-card-text">Das wichtigste auf 12 Seiten zusammengefasst: Core-Sounds, Atemtechnik, erste Beat-Patterns und häufige Fehler die Anfänger machen.</div>
+      <button class="info-download" onclick="alert('Download startet… (Demo)')">↓ PDF herunterladen — kostenlos</button>
+    </div>
+    <div class="info-card">
+      <div class="info-card-bg">MP3</div>
+      <div class="info-card-label">Übungstrack</div>
+      <div class="info-card-title">BACKING TRACKS<br>FÜR ÜBUNGEN</div>
+      <div class="info-card-text">10 Backing-Tracks in verschiedenen Tempos (80–140 BPM) zum Üben über Loops. Einfach abspielen, mitspielen, besser werden.</div>
+      <button class="info-download" onclick="alert('Download startet… (Demo)')">↓ Audio-Pack laden — kostenlos</button>
+    </div>
+    <div class="info-card">
+      <div class="info-card-bg">IPA</div>
+      <div class="info-card-label">Referenzblatt</div>
+      <div class="info-card-title">INTERNATIONALES<br>BEATBOX-ALPHABET</div>
+      <div class="info-card-text">Das komplette IBA (International Beatbox Alphabet) als übersichtliche Referenzkarte — laminierbar, fürs Studio geeignet.</div>
+      <button class="info-download" onclick="alert('Download startet… (Demo)')">↓ Alphabet-Karte laden</button>
+    </div>
+    <div class="info-card">
+      <div class="info-card-bg">PRO</div>
+      <div class="info-card-label">Kurs-Übersicht</div>
+      <div class="info-card-title">KURS-KATALOG<br>2025/26</div>
+      <div class="info-card-text">Alle 38 Module im Überblick: Lernziele, Voraussetzungen, Zeitaufwand und empfohlene Reihenfolge — dein persönlicher Lernplan.</div>
+      <button class="info-download" onclick="alert('Download startet… (Demo)')">↓ Katalog als PDF</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final" id="kontakt">
+  <div class="cta-bg"></div>
+  <h2>BEREIT FÜR<br><span>DEINEN SOUND?</span></h2>
+  <p>Trag dich ein und erhalte sofort Zugang zur kostenlosen Lektion + Grundlagen-PDF.</p>
+  <div class="cta-form">
+    <input class="cta-input" type="email" placeholder="deine@email.de" id="emailInput">
+    <button class="btn-primary" onclick="handleSignup()">Jetzt starten →</button>
+  </div>
+  <p style="margin-top:1rem; font-size:0.78rem; color:var(--gray); position:relative;">Kein Spam. Jederzeit abmelden. Datenschutz garantiert.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="nav-logo">BEAT<span>MASTER</span></span>
+    <p class="footer-tagline">Professionelles Beatbox-Coaching in Deutschland. Online, live, weltweit erreichbar.</p>
+  </div>
+  <div class="footer-col">
+    <div class="footer-col-title">Kurse</div>
+    <ul>
+      <li><a href="#">Free Starter</a></li>
+      <li><a href="#">Online Pro</a></li>
+      <li><a href="#">Live 1:1 Coaching</a></li>
+      <li><a href="#">Workshops</a></li>
+      <li><a href="#">Masterclass</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <div class="footer-col-title">Info</div>
+    <ul>
+      <li><a href="#">Über mich</a></li>
+      <li><a href="#">Methodik</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Presse</a></li>
+      <li><a href="#">FAQ</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <div class="footer-col-title">Rechtliches</div>
+    <ul>
+      <li><a href="#">Impressum</a></li>
+      <li><a href="#">Datenschutz</a></li>
+      <li><a href="#">AGB</a></li>
+      <li><a href="#">Kontakt</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2025 BeatMaster Pro — Alle Rechte vorbehalten</span>
+  <span style="display:flex;gap:1rem;">
+    <a href="#" style="color:var(--gray)">Instagram</a>
+    <a href="#" style="color:var(--gray)">TikTok</a>
+    <a href="#" style="color:var(--gray)">YouTube</a>
+  </span>
+</div>
+
+<script>
+// Custom cursor
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('button, a, .funnel-card, .module-card, .tcard, .info-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width = '56px'; ring.style.height = '56px'; ring.style.borderColor = 'rgba(255,208,0,0.8)'; });
+  el.addEventListener('mouseleave', () => { ring.style.width = '36px'; ring.style.height = '36px'; ring.style.borderColor = 'rgba(255,208,0,0.5)'; });
+});
+
+// Hero waveform bars
+const heroWave = document.getElementById('heroWave');
+const heights = [30,50,80,120,160,120,90,140,100,70,40,60,90,130,160,130,90,60,40,55];
+heights.forEach((h, i) => {
+  const bar = document.createElement('span');
+  bar.style.cssText = `--h:${h}px; animation-delay:${(i*0.07).toFixed(2)}s;`;
+  heroWave.appendChild(bar);
+});
+
+// Testimonials
+const testimonials = [
+  { stars: '★★★★★', text: '"Ich hatte nie gedacht, dass ich so schnell Fortschritte mache. Nach 4 Wochen Online Pro konnte ich meinen ersten richtigen Beat spielen."', name: 'Leon K.', meta: 'Online Pro Schüler · Hamburg' },
+  { stars: '★★★★★', text: '"Das 1:1 Coaching hat mein Niveau komplett verändert. Die strukturierte Methode ist einfach top — nirgendwo anders habe ich das so gelernt."', name: 'Sophie M.', meta: 'Live Coaching · Berlin' },
+  { stars: '★★★★★', text: '"Mega Kursaufbau. Die PDFs und Backing Tracks sind Gold wert. Endlich mal ein System das wirklich funktioniert!"', name: 'David R.', meta: 'Online Pro Schüler · München' },
+  { stars: '★★★★★', text: '"Ich trainiere seit 6 Monaten für die GBC. Die Wettbewerbs-Module haben mein Battle-Game komplett transformiert."', name: 'Aigerim T.', meta: '1:1 Coaching · Köln' },
+  { stars: '★★★★★', text: '"Als Mutter zweier Kinder war ich skeptisch ob Online-Kurse funktionieren. Ich lerne jetzt 3× pro Woche in meinem eigenen Tempo. Traumhaft!"', name: 'Maria B.', meta: 'Online Pro Schülerin · Frankfurt' },
+  { stars: '★★★★★', text: '"Die IBA-Referenzkarte hat mir so viel geholfen. Endlich verstehe ich die Notation und kann Beats schriftlich festhalten."', name: 'Tobias H.', meta: 'Einsteiger · Stuttgart' },
+];
+
+const track = document.getElementById('ttrack');
+[...testimonials, ...testimonials].forEach(t => {
+  const card = document.createElement('div');
+  card.className = 'tcard';
+  card.innerHTML = `<div class="tcard-stars">${t.stars}</div>
+    <div class="tcard-text">${t.text}</div>
+    <div class="tcard-author">
+      <div class="tcard-avatar">${t.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div><div class="tcard-name">${t.name}</div><div class="tcard-meta">${t.meta}</div></div>
+    </div>`;
+  track.appendChild(card);
+});
+
+// Email signup
+function handleSignup() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) {
+    alert('Bitte gib eine gültige E-Mail ein.');
+    return;
+  }
+  alert(`Super! Wir schicken deine kostenlosen Materialien an ${email} — checke deinen Posteingang!`);
+}
+</script>
+</body>
+</html>
